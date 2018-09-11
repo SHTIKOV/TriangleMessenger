@@ -1,6 +1,6 @@
 # Triangle Messenger
 
-> Autor: This is open source project for example simple куфд ешьу messenger.
+> This is open source project for example simple куфд ешьу messenger.
 
 ## Npm install:
 ```
