@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Triangle</title>
+  </head>
+  <body>
+    <div id="app">
+      <ul v-for="item in messages">
+        <li>{{ item.autor }}: {{ item.message }} <button @click="item.edit">Edit</button></li>    
+      </ul>
+      <input v-model="name" />
+      <input v-model="message" />
+      <button @click="send">Send</button>
+    </div>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+
+    <script>
+      /**
+       * Message model for editing message 
+       * @param {object} data
+       */
+      function MessageModel (data) {
+        var self = this;
+
+        self.id = 0;
+        self.autor = data.autor ? data.autor : 'Аноним';
+        self.message = data.msg ? data.msg : '';
+        self.status = data.status ? data.status : false;
+
+        /**
+         * Edit message
+         * @return {void}
+         */
+        self.edit = function () {
+          console.log ('Edit msg');
+        }
+      }
+
+      /**
+       * Main app model
+       */
+      function MainModel () {
+        var self = this;
+
+        self.socket = io ();
+        self.el = '#app';
+
+        /**
+         * Main variables by app
+         */
+        self.data = {
+          messages: [],
+          message: '',
+          name: 'Аноним',
+        };
+
+        /**
+         * Main methods by app
+         */
+        self.methods = {
+          send: function () {
+            let data = {
+              'msg': self.data.message,
+              'autor': self.data.name
+            };
+            self.socket.emit ('chat message', data);
+            self.data.message = '';
+          }
+        };
+
+        /**
+         * Method sending message
+         * @param  {object} data
+         * @return {void}
+         */
+        self.socket.on ('chat message', function (data) {
+          self.data.messages.push (new MessageModel (data));
+        });
+
+        /**
+         * Method sending message when user disconnect
+         * @return {void}
+         */
+        self.socket.on ('disconnect', function () {
+          self.data.messages.push (new MessageModel ({
+            'autor': 'System',
+            'msg': 'Какой то польователь вышел',
+          }));
+        });
+
+        /**
+         * Method sending message when user connect
+         * @return {void}
+         */
+        self.socket.on ('connection', function () {
+          self.data.messages.push (new MessageModel ({
+            'autor': 'System',
+            'msg': 'Плюс один юзер',
+          }));
+        });
+      }
+
+      /**
+       * Initialisation app
+       */
+      new Vue(new MainModel ());  
+    </script>
+  </body>
+</html>
