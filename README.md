@@ -1,12 +1,5 @@
 # Triangle Messenger
 
-```
-╔╗────╔╗────────╔═╗──────
-║╚╗╔╦╗╠╣╔═╗─╔═╦╗║╬║╔╗─╔═╗
-║╔╣║╔╝║║║╬╚╗║║║║╠╗║║╚╗║╩╣
-╚═╝╚╝─╚╝╚══╝╚╩═╝╚═╝╚═╝╚═╝
-```
-
 > This is open source project for example simple real time messenger.
 
 ## Npm install:
