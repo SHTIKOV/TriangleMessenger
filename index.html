@@ -120,6 +120,7 @@
          */
         self.socket.on ('chat message', function (data) {
           self.data.messages.push (new MessageModel (data));
+          window.document.title = 'Triangle ('+self.data.messages.length+')';
         });
 
         /**
