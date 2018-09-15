@@ -2,75 +2,97 @@
 <html>
   <head>
     <title>Triangle</title>
-
+    <style>
+        .mine {
+            text-align: right;
+        }
+    </style>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
   </head>
-  <body>
-    <div id="app" class="container">
-      <div v-for="item in messages" class="row">
-        <div class="alert alert-primary col-md-12" 
-             role="alert">
-          {{ item.autor }}: {{ item.message }} <button @click="item.edit">Edit</button>
-        </div>  
-      </div>
+  <body style="background-color: #333;">
+    <div id="app" class="row" style="margin: 10px;" >
+        <div class="left-seidbar col-md-2">
+            <div class="row">
+                <div class="col-md-12">
+                    <h1><span class="badge badge-secondary"
+                              v-text="name"></span></h1>
+                              <input v-model="name" />
+                </div>
+            </div>
+        </div>
 
-      <div class="form">
-        <div class="form-row align-items-center">
-          <div class="col-md-2">
-            <label class="sr-only" 
-                   for="inlineFormInput">Name</label>
-            <input type="text" 
-                   class="form-control-plaintext" 
-                   id="name" 
-                   v-model="name">
-          </div>
-          <div class="col-md-10">
-            <label class="sr-only" 
-                   for="inlineFormInputGroup">Message</label>
-            <div class="input-group">
-              <input type="textarea" 
-                     class="form-control" 
-                     id="message" 
-                     placeholder="Message" 
-                     v-model="message"
-                     @keyup.enter="send">
-              <div class="input-group-prepend">
-                <button class="btn btn-primary" 
-                        @click="send"
-                        @keyup.enter="send">Send</button>
+
+        <div class="messages col-md-10">
+            <div v-for="item in messages" class="row">
+                <div class="col-md-12">
+                    <div class="alert"
+                         v-bind:class="{ 'alert-primary mine': item.isMine, 'alert-dark': !item.isMine }"
+                         role="alert">
+                         {{ item.autor }}: {{ item.message }} <button @click="item.edit">Edit</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+            <div class="form col-md-12" style="bottom: 0px;position: absolute;width: 100%;">
+              <div class="form-row align-items-center">
+                <div class="col-md-12">
+                  <label class="sr-only"
+                         for="inlineFormInputGroup">Message</label>
+                  <div class="input-group">
+                    <input type="textarea"
+                           class="form-control"
+                           id="message"
+                           placeholder="Message"
+                           v-model="message"
+                           @keyup.enter="send">
+                    <div class="input-group-prepend">
+                      <button class="btn btn-primary"
+                              @click="send"
+                              @keyup.enter="send">Send</button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+            </div>
         </div>
-      </div>
+
+
+
+
 
     </div>
-    
+
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
 
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" 
-            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" 
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
             crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" 
-            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
             crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" 
-            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" 
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
             crossorigin="anonymous"></script>
 
     <script>
       /**
-       * Message model for editing message 
+       * Message model for editing message
        * @param {object} data
        */
-      function MessageModel (data) {
+      function MessageModel (data, MainModel) {
         var self = this;
 
         self.id = 0;
-        self.autor = data.autor ? data.autor : 'Аноним';
+        self.autor = data.autor ? data.autor : 'Константин';
         self.message = data.msg ? data.msg : '';
         self.status = data.status ? data.status : false;
+        self.isMine = (MainModel.data.name == self.autor);
+        console.log ('self.isMine', self.isMine);
+        console.log ('MainModel.data.name', MainModel.data.name);
+        console.log ('self.autor', self.autor);
 
         /**
          * Edit message
@@ -96,7 +118,8 @@
         self.data = {
           messages: [],
           message: '',
-          name: 'Аноним',
+          name: 'Константин',
+          windowHeigh: $(window).height()
         };
 
         /**
@@ -119,7 +142,7 @@
          * @return {void}
          */
         self.socket.on ('chat message', function (data) {
-          self.data.messages.push (new MessageModel (data));
+          self.data.messages.push (new MessageModel (data, self));
           window.document.title = 'Triangle ('+self.data.messages.length+')';
         });
 
@@ -131,7 +154,7 @@
           self.data.messages.push (new MessageModel ({
             'autor': 'System',
             'msg': 'Какой то польователь вышел',
-          }));
+        }, self));
         });
 
         /**
@@ -142,14 +165,16 @@
           self.data.messages.push (new MessageModel ({
             'autor': 'System',
             'msg': 'Плюс один юзер',
-          }));
+        }, self));
         });
+
+        $('#app').css ('height', $(window).height() - 20);
       }
 
       /**
        * Initialisation app
        */
-      new Vue(new MainModel ());  
+      new Vue(new MainModel ());
     </script>
   </body>
 </html>
